@@ -1,0 +1,106 @@
+#!/usr/bin/env python2
+# pip install Python_WebDAV_Library
+
+from webdav import WebdavClient
+import glob
+import logging
+import os
+import socket
+import socket
+import tarfile
+import time
+
+LOGFILE = '/var/log/dailybackup.log'
+URL = "https://webdav.mydrive.ch"
+USER = "<%= @mydrive_user_login %>"
+PASSWORD = "<%= @mydrive_password %>"
+BACKUP_PATH = '/backupoffsite/'
+MIN_SIZE = (10 * 1024 * 1024)
+
+FOLDERS = ['/var/backups/postgres',
+           '/var/log/',
+           '/etc/',
+           '/srv/']
+
+logging.basicConfig(format="%(asctime)s: %(levelname)s: %(message)s", 
+                    filename=LOGFILE,
+                    level=logging.DEBUG)
+
+
+class BackupError(Exception):
+    pass
+
+class Backup(object):
+
+    def __init__(self):
+        self.filename = "%s_backup_daily_%s.tar.gz" % (socket.gethostname(), time.strftime('%Y%m%d_%H%M'))
+        self.filepath = os.path.join(BACKUP_PATH, self.filename)
+        self.webdav = WebdavClient.CollectionStorer(URL)
+        webdav_logger = logging.getLogger('WebDav')
+        webdav_logger.setLevel(logging.ERROR)
+        self.webdav.connection.logger = webdav_logger
+        self.webdav.connection.addBasicAuthorization(USER, PASSWORD)       
+
+    def _create_archive(self):
+        from subprocess import Popen
+        cmd = 'tar cvpzf '+self.filepath+' '+' '.join(FOLDERS)+' --exclude=*-env/* --exclude-vcs'
+        logging.debug('Execute: %s' % cmd) 
+        tar_inp = os.popen(cmd,'w')
+        tar_exit_code= tar_inp.close()       
+        if  tar_exit_code != None and tar_exit_code % 256 :
+            raise BackupError('Tar exit Code: %s' % tar_exit_code)
+    
+    def _check_file(self):
+        today_backup_file = glob.glob(self.filepath)
+        # exists?
+        if len(today_backup_file) < 1:
+            raise BackupError('No backup file for today')
+        
+        # valid?
+        current_file = today_backup_file[0]
+        if not tarfile.is_tarfile(current_file):
+            raise BackupError('Invalid tar File')
+        tarfile.open(current_file, 'r:gz').close()
+        
+        # file size?
+        file_size = os.path.getsize(current_file)
+        if file_size < MIN_SIZE:
+            raise BackupError('Backup file for today too small: %s (%s bytes)' % (current_file, str(file_size)))
+
+        logging.debug('Backup OK. Backup seems to be OK %s (%s bytes)' % (current_file, str(file_size)))    
+    
+    def _local_cleanup(self):
+		files = glob.glob(os.path.join(BACKUP_PATH,'*'))
+		for f in files:
+		    os.remove(f)
+    
+    def _upload(self):
+        resource = self.webdav.addResource(self.filename)
+        resource.uploadFile(open(self.filepath))
+        
+    def _check_upload(self):
+        resources= self.webdav.listResources()
+        key = '/%s' % self.filename
+        if key not in resources:
+            raise BackupError('File not found in cloud')
+        
+        file_size = os.path.getsize(self.filepath)
+        uf = resources[key]
+        upload_size = '%s' % uf.properties['getcontentlength']
+        if int(upload_size) != file_size:
+            raise BackupError('Upload size for %s not valid: %s bytes (should be %s btyes)' % (key, upload_size, file_size))
+        logging.debug('Upload OK. %s - %s (%s Bytes)' % (key, uf.properties['getlastmodified'], file_size))    
+            
+    def go(self):
+        self._local_cleanup()
+        self._create_archive()
+        self._check_file()
+        self._upload()
+        self._check_upload()
+        
+if __name__ == "__main__":
+    try:
+        backup = Backup()
+        backup.go()
+    except:
+        logging.exception('Backup failed!')

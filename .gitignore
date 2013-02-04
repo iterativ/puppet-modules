@@ -1,0 +1,8 @@
+/.pydevproject
+*.out
+*.prefs
+.settings
+/.project
+.metadata/*
+*.pyc
+.idea/

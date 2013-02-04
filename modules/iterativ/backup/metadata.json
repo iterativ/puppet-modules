@@ -1,0 +1,20 @@
+{
+  "name": "ITerativ-backup",
+  "author": "daniel",
+  "description": "",
+  "license": "",
+  "project_page": "",
+  "source": "",
+  "summary": "",
+  "version": "1.0",
+  "checksums": {
+    "Modulefile": "3ff243424d1446149eca8e8f22eb1081",
+    "README": "0792db5eaebbca5aa53b3f8a40899f4f",
+    "manifests\\init.pp": "ab0b9b58cb2a4763f0f5d1786a2fe6e3",
+    "templates\\backup_postgres.py": "70218d6e320425f086efe798758cdf6d",
+    "templates\\cadaver_mydrive_template.rc": "3e698b9bd82da2d34c8e395db7e54b69",
+    "templates\\make_backup.sh.erb": "89441871edd5672847505f86182ee0fa",
+    "templates\\netrc_template.erb": "134ae3e213a60ffdb45eb0a03b5707cc"
+  },
+  "dependencies": []
+}
