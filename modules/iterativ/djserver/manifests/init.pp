@@ -64,17 +64,6 @@ class djserver {
     ensure => absent
   }
 
-  # install uwsgi
-  package {'uwsgi':
-    ensure => installed,
-    require => User['www-data']
-  }
-
-  package {'uwsgi-plugin-python':
-    ensure => installed,
-    require => Package['uwsgi']
-  }
-
   # utils
   package { ['locate', 'wget']:
     ensure => installed
@@ -121,10 +110,15 @@ class djserver {
       refreshonly => true,
     }
 
-    # uwsgi config change listener
-    exec { "restart-uwsgi":
-      command => "/etc/init.d/uwsgi restart",
-      refreshonly => true,
+    package {'uwsgi-python':
+      ensure => absent
     }
 
+    package {'uwsgi':
+      ensure => absent
+    }
+
+    package {'uwsgi-core':
+      ensure => absent
+    }
 }
