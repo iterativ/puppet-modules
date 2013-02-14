@@ -29,7 +29,7 @@ class backup {
     }
   }
 
-  define duplicity_backup_s3 {
+  define duplicity_backup_s3($aws_access_key_id, $aws_secret_access_key, $passphrase) {
     package { "duplicity":
       ensure => installed,
     }
@@ -38,6 +38,26 @@ class backup {
       ensure => installed,
       provider => 'pip',
       require => [Package["duplicity"]],
+    }
+
+    package { "s3cmd":
+      ensure => installed,
+    }
+
+    file { "/usr/local/bin/duplicity-backup.sh":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 755,
+      content => template("backup/duplicity-backup.sh"),
+    }
+
+    file { "/etc/duplicity-backup.conf":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 640,
+      content => template("backup/duplicity-backup.conf.erb"),
     }
   }
 

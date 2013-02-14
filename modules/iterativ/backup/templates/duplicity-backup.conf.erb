@@ -40,8 +40,8 @@
 
 # AMAZON S3 INFORMATION
 # Comment out this lines if you're not using Amazon S3
-AWS_ACCESS_KEY_ID="foobar_aws_key_id"
-AWS_SECRET_ACCESS_KEY="foobar_aws_access_key"
+AWS_ACCESS_KEY_ID="<%= @aws_access_key_id %>"
+AWS_SECRET_ACCESS_KEY="<%= @aws_secret_access_key %>"
 
 # S3CMD INFORMATION
 # Most people don't need that, but in some cases
@@ -62,7 +62,7 @@ ENCRYPTION='yes'
 # (your backups will be encrypted with this password) or is used
 # for the "GPG_SIGN_KEY" (see below).
 # Comment out if you aren't using encryption
-PASSPHRASE="foobar_gpg_passphrase"
+PASSPHRASE="<%= @passphrase %>"
 
 # Specify which GPG keys you would like to use (even if you have only one).
 # If you are running this from a cron, it is highly recommended to create separate
@@ -82,7 +82,7 @@ PASSPHRASE="foobar_gpg_passphrase"
 # The ROOT of your backup (where you want the backup to start);
 # This can be / or somwhere else -- I use /home/ because all the
 # directories start with /home/ that I want to backup.
-ROOT="/home"
+ROOT="/"
 
 # BACKUP DESTINATION INFORMATION
 # In my case, I use Amazon S3 use this - so I made up a unique
@@ -92,13 +92,13 @@ ROOT="/home"
 #
 # NOTE: You do need to keep the "s3+http://<your location>/" format
 # even though duplicity supports "s3://<your location>/".
-DEST="s3+http://backup-bucket/backup-folder/"
+DEST="s3+http://iterativbackuptest/"
 # Other possible locations
 #DEST="ftp://user[:password]@other.host[:port]/some_dir"
 #DEST="rsync://user@host.com[:port]//absolute_path"
 #DEST="scp://user[:password]@other.host[:port]/[/]some_dir"
 #DEST="ssh://user[:password]@other.host[:port]/[/]some_dir"
-#DEST="file:///home/foobar_user_name/new-backup-test/"
+#DEST="file:///tmp/backuptest"
 
 # INCLUDE LIST OF DIRECTORIES
 # Here is a list of directories to include; if you want to include
@@ -112,7 +112,7 @@ DEST="s3+http://backup-bucket/backup-folder/"
 #        )
 #
 # Simpler example with one location:
-INCLIST=( "/home/foobar_user_name/Documents/Prose/" )
+INCLIST=( "/srv" )
 
 # EXCLUDE LIST OF DIRECTORIES
 # Even though I am being specific about what I want to include,
@@ -151,9 +151,9 @@ CLEAN_UP_VARIABLE="2"
 # I run this script as root, but save the log files under my user name --
 # just makes it easier for me to read them and delete them as needed.
 
-LOGDIR="/home/foobar_user_name/logs/test2/"
+LOGDIR="/var/log/duplicity/"
 LOG_FILE="duplicity-`date +%Y-%m-%d_%H-%M`.txt"
-LOG_FILE_OWNER="foobar_user_name:foobar_user_name"
+LOG_FILE_OWNER="root:root"
 VERBOSITY="-v3"
 
 # EMAIL ALERT (*thanks: rmarescu*)
