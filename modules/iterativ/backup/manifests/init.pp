@@ -1,34 +1,4 @@
 class backup {
-  define offsite_backup($mydrive_user_login, $mydrive_password) {
-    file { "/backupoffsite":
-      ensure => directory,
-      owner => "root",
-      group => "root",
-      mode => 755
-    }
-
-    file { "/usr/local/bin/make_backup.py":
-      ensure => present,
-      owner => "root",
-      group => "root",
-      mode => 755,
-      content => template("backup/make_backup.py.erb")
-    }
-
-    package { "Python_WebDAV_Library":
-      ensure => installed,
-      provider => 'pip'
-    }
-
-    cron { "offsite-backup":
-      command => "/usr/local/bin/make_backup.py",
-      user => "root",
-      minute => 20,
-      hour => 2,
-      require => [File["/usr/local/bin/make_backup.py"]],
-    }
-  }
-
   define duplicity_backup_s3($aws_access_key_id, $aws_secret_access_key, $passphrase, $backup_destination, $inclist, $exclist) {
     package { "duplicity":
       ensure => installed,
