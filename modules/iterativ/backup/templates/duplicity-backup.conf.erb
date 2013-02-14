@@ -92,7 +92,7 @@ ROOT="/"
 #
 # NOTE: You do need to keep the "s3+http://<your location>/" format
 # even though duplicity supports "s3://<your location>/".
-DEST="<%= backup_destination %>"
+DEST="<%= backup_destination %>/<%= hostname %>"
 #DEST="s3+http://iterativbackuptest/"
 # Other possible locations
 #DEST="ftp://user[:password]@other.host[:port]/some_dir"
@@ -113,15 +113,20 @@ DEST="<%= backup_destination %>"
 #        )
 #
 # Simpler example with one location:
-INCLIST=( "/srv" )
+INCLIST=( 
+<% inclist.each do |incpath| %>
+  "<%= incpath %>" \
+<% end %>
+)
 
 # EXCLUDE LIST OF DIRECTORIES
 # Even though I am being specific about what I want to include,
 # there is still a lot of stuff I don't need.
-EXCLIST=(   "/home/*/Trash" \
-            "/home/*/Projects/Completed" \
-            "/**.DS_Store" "/**Icon?" "/**.AppleDouble" \
-        )
+EXCLIST=(
+<% exclist.each do |excpath| %>
+  "<%= excpath %>" \
+<% end %>
+)
 
 # STATIC BACKUP OPTIONS
 # Here you can define the static backup options that you want to run with
