@@ -29,6 +29,44 @@ class backup {
     }
   }
 
+  define duplicity_backup_s3($aws_access_key_id, $aws_secret_access_key, $passphrase, $backup_destination, $inclist, $exclist) {
+    package { "duplicity":
+      ensure => installed,
+    }
+
+    package { "boto":
+      ensure => installed,
+      provider => 'pip',
+      require => Package["duplicity"],
+    }
+
+    file { "/usr/local/bin/duplicity-backup.sh":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 755,
+      content => template("backup/duplicity-backup.sh"),
+      require => Package["boto"],
+    }
+
+    file { "/etc/duplicity-backup.conf":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 640,
+      content => template("backup/duplicity-backup.conf.erb"),
+      require => File["/usr/local/bin/duplicity-backup.sh"],
+    }
+
+    cron { "duplicity-backup-cron":
+      command => "/usr/local/bin/duplicity-backup.sh -c /etc/duplicity-backup.conf --backup",
+      user => "root",
+      minute => 20,
+      hour => 2,
+      require => [File["/etc/duplicity-backup.conf"]],
+    }
+  }
+
   define postgres_backup {
     file { "/var/backups/postgres":
       ensure => directory,
@@ -50,7 +88,7 @@ class backup {
     cron { "backup-postgres":
       command => "/usr/local/bin/backup_postgres.py",
       user => "postgres",
-      minute => 03,
+      minute => 01,
       hour => 2,
       require => File["/usr/local/bin/backup_postgres.py"]
     }
