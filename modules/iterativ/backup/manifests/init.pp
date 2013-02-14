@@ -37,7 +37,7 @@ class backup {
     package { "boto":
       ensure => installed,
       provider => 'pip',
-      require => [Package["duplicity"]],
+      require => Package["duplicity"],
     }
 
     file { "/usr/local/bin/duplicity-backup.sh":
@@ -59,9 +59,9 @@ class backup {
     }
 
     cron { "duplicity-backup-cron":
-      command => "/usr/local/bin/duplicity-backup.py -c /etc/duplicity-backup.conf --backup",
+      command => "/usr/local/bin/duplicity-backup.sh -c /etc/duplicity-backup.conf --backup",
       user => "root",
-      minute => 00,
+      minute => 20,
       hour => 2,
       require => [File["/etc/duplicity-backup.conf"]],
     }
