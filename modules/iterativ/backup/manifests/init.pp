@@ -40,16 +40,13 @@ class backup {
       require => [Package["duplicity"]],
     }
 
-    package { "s3cmd":
-      ensure => installed,
-    }
-
     file { "/usr/local/bin/duplicity-backup.sh":
       ensure => present,
       owner => root,
       group => root,
       mode => 755,
       content => template("backup/duplicity-backup.sh"),
+      require => Package["boto"],
     }
 
     file { "/etc/duplicity-backup.conf":
@@ -58,6 +55,15 @@ class backup {
       group => root,
       mode => 640,
       content => template("backup/duplicity-backup.conf.erb"),
+      require => File["/usr/local/bin/duplicity-backup.sh"],
+    }
+
+    cron { "duplicity-backup-cron":
+      command => "/usr/local/bin/duplicity-backup.py -c /etc/duplicity-backup.conf --backup",
+      user => "root",
+      minute => 00,
+      hour => 2,
+      require => [File["/etc/duplicity-backup.conf"]],
     }
   }
 
@@ -82,7 +88,7 @@ class backup {
     cron { "backup-postgres":
       command => "/usr/local/bin/backup_postgres.py",
       user => "postgres",
-      minute => 03,
+      minute => 01,
       hour => 2,
       require => File["/usr/local/bin/backup_postgres.py"]
     }
