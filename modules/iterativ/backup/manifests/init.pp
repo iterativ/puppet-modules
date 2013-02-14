@@ -29,6 +29,18 @@ class backup {
     }
   }
 
+  define duplicity_backup_s3 {
+    package { "duplicity":
+      ensure => installed,
+    }
+
+    package { "boto":
+      ensure => installed,
+      provider => 'pip',
+      require => [Package["duplicity"]],
+    }
+  }
+
   define postgres_backup {
     file { "/var/backups/postgres":
       ensure => directory,
