@@ -92,7 +92,8 @@ ROOT="/"
 #
 # NOTE: You do need to keep the "s3+http://<your location>/" format
 # even though duplicity supports "s3://<your location>/".
-DEST="s3+http://iterativbackuptest/"
+DEST="<%= backup_destination %>"
+#DEST="s3+http://iterativbackuptest/"
 # Other possible locations
 #DEST="ftp://user[:password]@other.host[:port]/some_dir"
 #DEST="rsync://user@host.com[:port]//absolute_path"
