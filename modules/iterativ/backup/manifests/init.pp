@@ -75,5 +75,30 @@ class backup {
       hour => 2,
       require => File["/usr/local/bin/backup_postgres.py"]
     }
+    
+    file { "/usr/local/bin/rotate-backups-postgres.py":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 755,
+      content => template("backup/rotate-backups.py"),
+    }
+
+    file { "/root/.rotate-backupsrc":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 644,
+      content => template("backup/rotate-backups.conf"),
+      require => File["/usr/local/bin/rotate-backups-postgres.py"],
+    }
+
+    cron { "rotate-backup-postgres":
+      command => "/usr/local/bin/rotate-backups-postgres.py",
+      user => "root",
+      minute => 50,
+      hour => 1,
+      require => File["/usr/local/bin/rotate-backups-postgres.py"],
+    }
   }
 }
