@@ -10,6 +10,10 @@ class backup {
       require => Package["duplicity"],
     }
 
+    package { "s3cmd":
+      ensure => installed,
+    }
+
     file { "/usr/local/bin/duplicity-backup.sh":
       ensure => present,
       owner => root,
@@ -33,7 +37,7 @@ class backup {
       user => "root",
       minute => 20,
       hour => 2,
-      require => [File["/etc/duplicity-backup.conf"]],
+      require => [File["/etc/duplicity-backup.conf"], Package["s3cmd"]],
     }
   }
 
