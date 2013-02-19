@@ -1,0 +1,31 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:LOGGING - [0:0]
+
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 50000:60000 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# Prevent Simple DoS attack
+#-A INPUT -p tcp --dport 22 -m limit --limit 100/minute --limit-burst 200 -j ACCEPT
+#-A INPUT -p tcp --dport 80 -m limit --limit 100/minute --limit-burst 200 -j ACCEPT
+#-A INPUT -p tcp --dport 443 -m limit --limit 100/minute --limit-burst 200 -j ACCEPT
+
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -j DROP
+-A INPUT -j LOGGING
+
+-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A OUTPUT -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT
+
+-A LOGGING -m limit --limit 2/min -j LOG --log-prefix "Packet Dropped: " --log-level 7
+-A LOGGING -j DROP
+
+COMMIT
+
+

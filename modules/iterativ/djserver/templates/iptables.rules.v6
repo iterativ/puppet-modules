@@ -1,0 +1,11 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# drop all
+-A INPUT -j DROP
+
+COMMIT
+
+
