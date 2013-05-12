@@ -101,4 +101,47 @@ class backup {
       require => File["/usr/local/bin/rotate-backups-postgres.py"],
     }
   }
+
+  define mysql_backup($mysql_user, $mysql_password, $mysql_ignore_db) {
+    file { "/var/backups/mysql":
+      ensure => directory,
+      owner => "mysql",
+      group => "mysql",
+      mode => 755
+    }
+
+    file { "/etc/automysqlbackup":
+      ensure => directory,
+      owner => "mysql",
+      group => "mysql",
+      mode => 755
+    }
+
+    # copies the backup script into the specified folder
+    file { "/usr/local/bin/automysqlbackup":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 755,
+      content => template("backup/automysqlbackup"),
+      require => File["/var/backups/mysql"]
+    }
+
+    file { "/etc/automysqlbackup/server.conf":
+      ensure => present,
+      owner => root,
+      group => root,
+      mode => 655,
+      content => template("backup/automysqlbackup.conf.erb")
+    }
+
+    cron { "mysql-backup":
+      command => "/usr/local/bin/automysqlbackup /etc/automysqlbackup/server.conf",
+      user => "root",
+      minute => 01,
+      hour => 2,
+      require => [File["/etc/duplicity-backup.conf"], File["/etc/s3cmd.conf"]], 
+    }
+
+  }
 }
