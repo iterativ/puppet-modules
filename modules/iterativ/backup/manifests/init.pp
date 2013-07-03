@@ -140,7 +140,7 @@ class backup {
       user => "root",
       minute => 01,
       hour => 2,
-      require => [File["/etc/duplicity-backup.conf"], File["/etc/s3cmd.conf"]], 
+      require => [File["/etc/duplicity-backup.conf"], File["/etc/s3cmd.conf"]]
     }
 
   }

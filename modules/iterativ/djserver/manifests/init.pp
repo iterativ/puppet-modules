@@ -106,6 +106,13 @@ class djserver {
       ensure => installed
     }
 
+    # need for mysql install
+    # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
+    exec { "upgrade_distribute":
+        command => "/usr/bin/easy_install -U distribute",
+        require => Package['python'],
+    }
+
     # TODO: still needed for 2.7
     file {'/usr/lib/python2.7/decimal.py':
       ensure => present,
