@@ -110,8 +110,14 @@ class djserver {
     # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
     exec { "upgrade_distribute":
         command => "/usr/bin/easy_install -U distribute",
-        require => Package['python'],
+        require => Package['python-setuptools'],
     }
+    exec { "upgrade_virtualenv":
+        command => "sudo easy_install -U virtualenv",
+        require => Package['python-virtualenv'],
+    }
+
+
 
     # TODO: still needed for 2.7
     file {'/usr/lib/python2.7/decimal.py':
