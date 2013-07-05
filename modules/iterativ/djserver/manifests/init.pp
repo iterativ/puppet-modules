@@ -113,8 +113,9 @@ class djserver {
         require => Package['python-setuptools'],
     }
     exec { "upgrade_virtualenv":
-        command => "sudo easy_install -U virtualenv",
+        command => "/usr/bin/easy_install -U virtualenv",
         require => Package['python-virtualenv'],
+        user => root,
     }
 
 
