@@ -119,7 +119,7 @@ class djserver {
     }
 
     # set time
-    exec { "upgrade_virtualenv":
+    exec { "set_time":
         command => "/usr/sbin/ntpdate -b pool.ntp.org",
         require => Package['ntpdate'],
         user => root,
