@@ -102,7 +102,7 @@ class djserver {
     }        
     # python and django project prerequisites
     package { ['python', 'python-dev', 'python-setuptools', 'python-virtualenv', 
-    'python-pip']:
+    'python-pip', 'ntpdate']:
       ensure => installed
     }
 
@@ -118,6 +118,12 @@ class djserver {
         user => root,
     }
 
+    # set time
+    exec { "upgrade_virtualenv":
+        command => "/usr/sbin/ntpdate -b pool.ntp.org",
+        require => Package['ntpdate'],
+        user => root,
+    }
 
 
     # TODO: still needed for 2.7
