@@ -15,8 +15,8 @@ class djserver {
 
   include locales
 
-  # install nginx    
-  package {'nginx': 
+  # install nginx
+  package {'nginx':
     ensure => installed,
     require => [Class['locales'], User['www-data']]
   }
@@ -64,9 +64,9 @@ class djserver {
     ensure => absent
   }
 
-  # firewall 
+  # firewall
   package { ['vim', 'iptables-persistent', 'iptables']:
-      ensure => installed
+    ensure => installed
   }
 
   service {'iptables-persistent':
@@ -99,80 +99,79 @@ class djserver {
   # utils
   package { ['locate', 'wget']:
     ensure => installed
-    }        
-    # python and django project prerequisites
-    package { ['python', 'python-dev', 'python-setuptools', 'python-virtualenv', 
-    'python-pip']:
-      ensure => installed
-    }
+  }
+  # python and django project prerequisites
+  package { ['python', 'python-dev', 'python-setuptools', 'python-virtualenv', 'python-pip']:
+    ensure => installed
+  }
 
-    # need for mysql install
-    # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
-    exec { "upgrade_distribute":
-        command => "/usr/bin/easy_install -U distribute",
-        require => Package['python-setuptools'],
-    }
-    exec { "upgrade_virtualenv":
-        command => "/usr/bin/easy_install -U virtualenv",
-        require => Package['python-virtualenv'],
-        user => root,
-    }
+  # need for mysql install
+  # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
+  exec { "upgrade_distribute":
+    command => "/usr/bin/easy_install -U distribute",
+    require => Package['python-setuptools'],
+  }
+  exec { "upgrade_virtualenv":
+    command => "/usr/bin/easy_install -U virtualenv",
+    require => Package['python-virtualenv'],
+    user => root,
+  }
 
-    package { "ntp":
-        ensure => installed
-    }
+  package { "ntp":
+    ensure => installed
+  }
 
-    service { "ntp":
-        ensure => running,
-        enable => true,
-        require => Package['ntp']
-    }
+  service { "ntp":
+    ensure => running,
+    enable => true,
+    require => Package['ntp']
+  }
 
-    # TODO: still needed for 2.7
-    file {'/usr/lib/python2.7/decimal.py':
-      ensure => present,
-      require => Package['python'],
-      content => template("djserver/fix_decimal.py")
-    }
+  # TODO: still needed for 2.7
+  file {'/usr/lib/python2.7/decimal.py':
+    ensure => present,
+    require => Package['python'],
+    content => template("djserver/fix_decimal.py")
+  }
 
-    # make python semaphores workings: 
-    # see: http://stackoverflow.com/questions/2009278/python-multiprocessing-permission-denied
-    file_line { 'shm mountable':
-      line => 'none /dev/shm tmpfs rw,nosuid,nodev,noexec 0 0',
-      path => '/etc/fstab',
-    }
+  # make python semaphores workings:
+  # see: http://stackoverflow.com/questions/2009278/python-multiprocessing-permission-denied
+  file_line { 'shm mountable':
+    line => 'none /dev/shm tmpfs rw,nosuid,nodev,noexec 0 0',
+    path => '/etc/fstab',
+  }
 
-    exec { 'mount shm':
-      command => '/bin/mount -a /dev/shm/',
-      require => File_line['shm mountable'],
-    }
+  exec { 'mount shm':
+    command => '/bin/mount -a /dev/shm/',
+    require => File_line['shm mountable'],
+  }
 
-    # user/group
-    group {'www-data':
-      ensure => present,
-    }
-    user {'www-data':
-      ensure => present,
-      managehome => true,
-      groups => ['adm','www-data'],
-      require => Group['www-data']
-    }
+  # user/group
+  group {'www-data':
+    ensure => present,
+  }
+  user {'www-data':
+    ensure => present,
+    managehome => true,
+    groups => ['adm','www-data'],
+    require => Group['www-data']
+  }
 
-    # nginx config change listener
-    exec { "restart-nginx":
-      command => "/etc/init.d/nginx restart",
-      refreshonly => true,
-    }
+  # nginx config change listener
+  exec { "restart-nginx":
+    command => "/etc/init.d/nginx restart",
+    refreshonly => true,
+  }
 
-    package {'uwsgi-python':
-      ensure => absent
-    }
+  package {'uwsgi-python':
+    ensure => absent
+  }
 
-    package {'uwsgi':
-      ensure => absent
-    }
+  package {'uwsgi':
+    ensure => absent
+  }
 
-    package {'uwsgi-core':
-      ensure => absent
-    }
+  package {'uwsgi-core':
+    ensure => absent
+  }
 }
