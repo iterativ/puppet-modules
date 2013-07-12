@@ -102,7 +102,7 @@ class djserver {
     }        
     # python and django project prerequisites
     package { ['python', 'python-dev', 'python-setuptools', 'python-virtualenv', 
-    'python-pip', 'ntpdate']:
+    'python-pip']:
       ensure => installed
     }
 
@@ -118,13 +118,15 @@ class djserver {
         user => root,
     }
 
-    # set time
-    exec { "set_time":
-        command => "/usr/sbin/ntpdate -b pool.ntp.org",
-        require => Package['ntpdate'],
-        user => root,
+    package { "ntp":
+        ensure => installed
     }
 
+    service { "ntp":
+        ensure => running,
+        enable => true,
+        require => Package['ntp']
+    }
 
     # TODO: still needed for 2.7
     file {'/usr/lib/python2.7/decimal.py':
