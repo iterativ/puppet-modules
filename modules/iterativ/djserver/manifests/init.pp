@@ -123,16 +123,22 @@ class djserver {
   }
 
   # need for mysql install
-  exec { "install_virtualenv":
-    command => "/usr/bin/easy_install -U virtualenv==1.9.1",
-    require => Package['python-setuptools', 'python-virtualenv', 'python-pip'],
-    user => root,
-  }
-
   exec { "install_pip":
     command => "/usr/bin/easy_install -U pip==1.3.1",
     require => Package['python-setuptools', 'python-virtualenv', 'python-pip'],
     user => root,
+  }
+
+  package { "virtualenv":
+    provider => pip,
+    ensure => '1.9.1',
+    require => Exec['install_pip'],
+  }
+
+  package { "distribute":
+    provider => pip,
+    ensure => '0.7.3',
+    require => Exec['install_pip'],
   }
 
 
