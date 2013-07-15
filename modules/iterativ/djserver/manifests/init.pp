@@ -101,11 +101,6 @@ class djserver {
     ensure => installed
   }
 
-  # ensure that python is installed
-  package { ['python', 'python-dev']:
-    ensure => installed
-  }
-
   # for the global python we will always use virtualenv to handle python dependencies
   # we will never install python libraries globally on the system
   # do ensure that we do the following steps:
@@ -114,31 +109,37 @@ class djserver {
   # 3. install virtualenv via easy_install globally on the system
   # we do this to have the newest version of virtualenv available it is needed to handel mysql-python via pip install:
   # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
-  package { ['python-virtualenv', 'python-pip']:
-    ensure => absent
-  }
-
-  package { 'python-setuptools':
-    ensure => present
-  }
-
   # need for mysql install
-  exec { "install_pip":
-    command => "/usr/bin/easy_install -U pip==1.3.1",
-    require => Package['python-setuptools', 'python-virtualenv', 'python-pip'],
-    user => root,
+
+  # ACHTUNG: falls eine Version von pip, setuptools und/oder virtualenv geändert wird, müssen ev. die virtualenv neu
+  # erstellt werden!!!
+  # ensure that python is installed
+  package { ['python', 'python-dev', 'python-pip', 'python-setuptools']:
+    ensure => installed
   }
 
-  package { "virtualenv":
+  package { 'pip':
     provider => pip,
-    ensure => '1.9.1',
-    require => Exec['install_pip'],
+    ensure => '1.3.1',
+    require => Package['python-pip'],
   }
 
-  package { "distribute":
+  package { 'setuptools':
+    provider => pip,
+    ensure => '0.9.1',
+    require => Package['pip'],
+  }
+
+  package { 'distribute':
     provider => pip,
     ensure => '0.7.3',
-    require => Exec['install_pip'],
+    require => Package['pip'],
+  }
+
+  package { 'virtualenv':
+    provider => pip,
+    ensure => '1.9.1',
+    require => Package['pip'],
   }
 
 
