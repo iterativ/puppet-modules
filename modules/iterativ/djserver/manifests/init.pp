@@ -100,22 +100,48 @@ class djserver {
   package { ['locate', 'wget']:
     ensure => installed
   }
-  # python and django project prerequisites
-  package { ['python', 'python-dev', 'python-setuptools', 'python-virtualenv', 'python-pip']:
+
+  # ensure that python is installed
+  package { ['python', 'python-dev']:
     ensure => installed
   }
 
-  # need for mysql install
+  # for the global python we will always use virtualenv to handle python dependencies
+  # we will never install python libraries globally on the system
+  # do ensure that we do the following steps:
+  # 1. install python-setuptools (it contains easy_install)
+  # 2. install the newest pip globally via easy_install (to upgrade virtualenv in the future)
+  # 3. install virtualenv via easy_install globally on the system
+  # 4. remove python-setuptools
+  # we do this to have the newest version of virtualenv available it is needed to handel mysql-python via pip install:
   # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
-  exec { "upgrade_distribute":
-    command => "/usr/bin/easy_install -U distribute",
-    require => Package['python-setuptools'],
+  package { ['python-virtualenv', 'python-pip']:
+    ensure => absent
   }
-  exec { "upgrade_virtualenv":
-    command => "/usr/bin/easy_install -U virtualenv",
-    require => Package['python-virtualenv'],
+
+  package { 'python-setuptools':
+    ensure => present
+  }
+
+  # need for mysql install
+  exec { "install_virtualenv":
+    command => "/usr/bin/easy_install -U virtualenv==1.9.1",
+    require => Package['python-setuptools', 'python-virtualenv', 'python-pip'],
     user => root,
   }
+
+  exec { "install_pip":
+    command => "/usr/bin/easy_install -U pip==1.3.1",
+    require => Package['python-setuptools', 'python-virtualenv', 'python-pip'],
+    user => root,
+  }
+
+  exec { 'python-setuptools-remove':
+    command => '/usr/bin/apt-get remove python-setuptools -y',
+    require => Exec['install_virtualenv', 'install_pip'],
+    user => root,
+  }
+
 
   package { "ntp":
     ensure => installed
