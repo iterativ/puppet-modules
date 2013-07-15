@@ -112,7 +112,6 @@ class djserver {
   # 1. install python-setuptools (it contains easy_install)
   # 2. install the newest pip globally via easy_install (to upgrade virtualenv in the future)
   # 3. install virtualenv via easy_install globally on the system
-  # 4. remove python-setuptools
   # we do this to have the newest version of virtualenv available it is needed to handel mysql-python via pip install:
   # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
   package { ['python-virtualenv', 'python-pip']:
@@ -133,12 +132,6 @@ class djserver {
   exec { "install_pip":
     command => "/usr/bin/easy_install -U pip==1.3.1",
     require => Package['python-setuptools', 'python-virtualenv', 'python-pip'],
-    user => root,
-  }
-
-  exec { 'python-setuptools-remove':
-    command => '/usr/bin/apt-get remove python-setuptools -y',
-    require => Exec['install_virtualenv', 'install_pip'],
     user => root,
   }
 
