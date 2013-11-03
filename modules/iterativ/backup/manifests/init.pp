@@ -131,7 +131,7 @@ class backup {
       ensure => present,
       owner => root,
       group => root,
-      mode => 655,
+      mode => 600,
       content => template("backup/automysqlbackup.conf.erb")
     }
 
