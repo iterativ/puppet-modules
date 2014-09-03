@@ -65,7 +65,7 @@ class djserver {
   }
 
   # firewall
-  package { ['vim', 'iptables-persistent', 'iptables']:
+  package { ['iptables-persistent', 'iptables']:
     ensure => installed
   }
 
@@ -95,53 +95,14 @@ class djserver {
     require => Package[iptables-persistent]
   }
 
-
   # utils
-  package { ['locate', 'wget']:
+  package { ['locate', 'wget', 'vim', 'tmux']:
     ensure => installed
   }
 
-  # for the global python we will always use virtualenv to handle python dependencies
-  # we will never install python libraries globally on the system
-  # do ensure that we do the following steps:
-  # 1. install python-setuptools (it contains easy_install)
-  # 2. install the newest pip globally via easy_install (to upgrade virtualenv in the future)
-  # 3. install virtualenv via easy_install globally on the system
-  # we do this to have the newest version of virtualenv available it is needed to handel mysql-python via pip install:
-  # http://stackoverflow.com/questions/12993708/unable-to-install-mysql-python
-  # need for mysql install
-
-  # ACHTUNG: falls eine Version von pip, setuptools und/oder virtualenv geändert wird, müssen ev. die virtualenv neu
-  # erstellt werden!!!
-  # ensure that python is installed
-  package { ['python', 'python-dev', 'python-pip', 'python-setuptools']:
+  package { ['python', 'python-dev', 'python-pip', 'python-setuptools', 'python-virtualenv']:
     ensure => installed
   }
-
-  package { 'pip':
-    provider => pip,
-    ensure => '1.3.1',
-    require => Package['python-pip'],
-  }
-
-  package { 'setuptools':
-    provider => pip,
-    ensure => '0.9.1',
-    require => Package['pip'],
-  }
-
-  package { 'distribute':
-    provider => pip,
-    ensure => '0.7.3',
-    require => Package['pip'],
-  }
-
-  package { 'virtualenv':
-    provider => pip,
-    ensure => '1.9.1',
-    require => Package['pip'],
-  }
-
 
   package { "ntp":
     ensure => installed
@@ -153,7 +114,7 @@ class djserver {
     require => Package['ntp']
   }
 
-  # TODO: still needed for 2.7
+  # TODO: still needed for 2.7??
   file {'/usr/lib/python2.7/decimal.py':
     ensure => present,
     require => Package['python'],
@@ -189,15 +150,9 @@ class djserver {
     refreshonly => true,
   }
 
-  package {'uwsgi-python':
-    ensure => absent
+  # uwsgi
+  package {['uwsgi', 'uwsgi-plugin-python']:
+    ensure => present
   }
 
-  package {'uwsgi':
-    ensure => absent
-  }
-
-  package {'uwsgi-core':
-    ensure => absent
-  }
 }
