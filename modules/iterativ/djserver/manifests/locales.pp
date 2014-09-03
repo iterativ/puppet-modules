@@ -1,4 +1,4 @@
-class locales($default="en_US.UTF-8", $available=["en_US.UTF-8 UTF-8"]) {
+class djserver::locales($default="en_US.UTF-8", $available=["en_US.UTF-8 UTF-8"]) {
   package { locales:
     ensure => present,
   }
@@ -8,20 +8,20 @@ class locales($default="en_US.UTF-8", $available=["en_US.UTF-8 UTF-8"]) {
   }
 
   file { "/etc/default/locale":
-    ensure => present,
+    ensure  => present,
     content => template("djserver/locale.erb")
   }
 
   exec { "locale-gen":
-    subscribe => [File["/etc/locale.gen"], File["/etc/default/locale"]],
+    subscribe   => [File["/etc/locale.gen"], File["/etc/default/locale"]],
     refreshonly => true,
-    path => '/bin:/sbin:/usr/bin:/usr/sbin',
+    path        => '/bin:/sbin:/usr/bin:/usr/sbin',
   }
 
   exec { "update-locale":
-    subscribe => [File["/etc/locale.gen"], File["/etc/default/locale"]],
+    subscribe   => [File["/etc/locale.gen"], File["/etc/default/locale"]],
     refreshonly => true,
-    path => '/bin:/sbin:/usr/bin:/usr/sbin',
+    path        => '/bin:/sbin:/usr/bin:/usr/sbin',
   }
 
   Package[locales] -> File["/etc/locale.gen"] -> File["/etc/default/locale"]
