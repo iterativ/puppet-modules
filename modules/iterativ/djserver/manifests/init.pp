@@ -120,13 +120,13 @@ class djserver {
 
   package { 'pip':
     provider => pip,
-    ensure => '1.3.1',
+    ensure => '7.1.2',
     require => Package['python-pip'],
   }
 
   package { 'setuptools':
     provider => pip,
-    ensure => '0.9.1',
+    ensure => '18.3.2',
     require => Package['pip'],
   }
 
@@ -138,7 +138,7 @@ class djserver {
 
   package { 'virtualenv':
     provider => pip,
-    ensure => '1.9.1',
+    ensure => '13.1.2',
     require => Package['pip'],
   }
 
