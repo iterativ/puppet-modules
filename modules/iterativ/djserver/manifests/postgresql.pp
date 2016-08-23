@@ -18,7 +18,7 @@ class djserver::postgresql {
 # best practices for postgresql.conf
   postgresql::server::config_entry { 'shared_buffers':
   # ca. 1/8 vom RAM. Zwischen 256MB und 2GB, auf VPS natürlich entsprechend
-    value => '128MB',
+    value => '512MB',
   }
 
   postgresql::server::config_entry { 'work_mem':
