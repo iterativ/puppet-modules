@@ -1,4 +1,4 @@
-class djserver::nginx {
+class djserver::nginx($disable_default=false,) {
 
   require djserver
 
