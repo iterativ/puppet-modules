@@ -7,7 +7,7 @@ class djserver::firewall {
     ensure => installed
   }
 
-  service { 'iptables-persistent':
+  service { 'netfilter-persistent':
     ensure  => running,
     enable  => true,
     require => [File["rules.v4"], File["rules.v6"]],
