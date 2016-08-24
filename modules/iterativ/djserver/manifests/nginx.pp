@@ -2,13 +2,23 @@ class djserver::nginx($disable_default=false,) {
 
   require djserver
 
-# install nginx
+  # install nginx
   package { 'nginx':
     ensure  => installed,
     require => [Class['locales'], User['www-data']]
   }
 
-# get rid of the default site
+  package { 'letsencrypt ':
+    ensure => installed,
+    require => Package['nginx']
+  }
+
+  file { '/tmp/letsencrypt-auto':
+    ensure => 'directory',
+    mode => '0777'
+  }
+
+  # get rid of the default site
   file { '/etc/nginx/sites-available/default':
     ensure  => absent,
     require => Package['nginx']
@@ -44,7 +54,7 @@ class djserver::nginx($disable_default=false,) {
     ensure => absent
   }
 
-# user/group
+  # user/group
   group { 'www-data':
     ensure => present,
   }
@@ -55,7 +65,7 @@ class djserver::nginx($disable_default=false,) {
     require    => Group['www-data']
   }
 
-# nginx config change listener
+  # nginx config change listener
   exec { "restart-nginx":
     command     => "/etc/init.d/nginx restart",
     refreshonly => true,
