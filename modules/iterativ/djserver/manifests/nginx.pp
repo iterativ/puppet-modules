@@ -84,4 +84,9 @@ class djserver::nginx($disable_default=false,) {
     hour    => 2,
     minute  => 35
   }
+
+  exec { 'generate_strong_diffie_hellman_group':
+    command => '/usr/bin/openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048',
+    creates => '/etc/ssl/certs/dhparam.pem'
+  }
 }
