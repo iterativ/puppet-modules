@@ -70,4 +70,18 @@ class djserver::nginx($disable_default=false,) {
     command     => "/etc/init.d/nginx restart",
     refreshonly => true,
   }
+
+  cron { 'letsencrypt_renew':
+    command => "letsencrypt renew",
+    user    => root,
+    hour    => 2,
+    minute  => 30
+  }
+
+  cron { 'reload_nginx':
+    command => "/etc/init.d/nginx reload",
+    user    => root,
+    hour    => 2,
+    minute  => 35
+  }
 }
