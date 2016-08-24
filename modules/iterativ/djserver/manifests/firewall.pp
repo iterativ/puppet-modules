@@ -14,7 +14,7 @@ class djserver::firewall {
   }
 
   file { 'rules.v4':
-    notify  => Service["iptables-persistent"],
+    notify  => Service["netfilter-persistent"],
     path    => '/etc/iptables/rules.v4',
     ensure  => present,
     owner   => "root",
@@ -24,7 +24,7 @@ class djserver::firewall {
   }
 
   file { 'rules.v6':
-    notify  => Service["iptables-persistent"],
+    notify  => Service["netfilter-persistent"],
     path    => '/etc/iptables/rules.v6',
     ensure  => present,
     owner   => "root",

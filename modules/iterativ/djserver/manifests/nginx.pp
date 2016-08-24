@@ -8,7 +8,7 @@ class djserver::nginx($disable_default=false,) {
     require => [Class['locales'], User['www-data']]
   }
 
-  package { 'letsencrypt ':
+  package { 'letsencrypt':
     ensure => installed,
     require => Package['nginx']
   }
