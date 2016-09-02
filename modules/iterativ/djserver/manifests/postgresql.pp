@@ -113,7 +113,7 @@ class djserver::postgresql {
   class { '::rabbitmq':
     service_manage    => false,
     port              => '5672',
-    delete_guest_user => true,
+    #delete_guest_user => true,
   }
 
 }
