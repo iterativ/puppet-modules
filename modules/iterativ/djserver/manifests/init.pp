@@ -17,11 +17,18 @@ class djserver {
     content => template("djserver/sudo_keep_ssh_auth_sock.erb")
   }
 
+  file { '/root/.ssh':
+    ensure  => 'directory',
+    owner  => 'root',
+    group  => 'root',
+  }
+
   file { '/root/.ssh/known_hosts':
     ensure  => 'present',
     replace => 'no',
-    content => "",
+    content => '',
     mode    => '0644',
+    require => File['/root/.ssh']
   }
 
   exec { "add_github_key":
