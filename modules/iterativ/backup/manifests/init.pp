@@ -10,19 +10,6 @@ class backup {
       require => Package["duplicity"],
     }
 
-    package { "s3cmd":
-      ensure => installed,
-    }
-
-    file { "/etc/s3cmd.conf":
-      ensure => present,
-      owner => root,
-      group => root,
-      mode => 640,
-      content => template("backup/s3cmd.conf.erb"),
-      require => Package["s3cmd"],
-    }
-
     file { "/usr/local/bin/duplicity-backup.sh":
       ensure => present,
       owner => root,
@@ -46,7 +33,7 @@ class backup {
       user => "root",
       minute => 20,
       hour => 2,
-      require => [File["/etc/duplicity-backup.conf"], File["/etc/s3cmd.conf"]], 
+      require => [File["/etc/duplicity-backup.conf"]],
     }
   }
 
@@ -75,7 +62,7 @@ class backup {
       hour => 2,
       require => File["/usr/local/bin/backup_postgres.py"]
     }
-    
+
     file { "/usr/local/bin/rotate-backups-postgres.py":
       ensure => present,
       owner => root,
@@ -140,7 +127,7 @@ class backup {
       user => "root",
       minute => 01,
       hour => 2,
-      require => [File["/etc/duplicity-backup.conf"], File["/etc/s3cmd.conf"]]
+      require => [File["/etc/duplicity-backup.conf"]],
     }
 
   }
