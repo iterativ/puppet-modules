@@ -39,13 +39,6 @@ class djserver::postgresql {
     value => 'off',
   }
 
-  postgresql::server::config_entry { 'checkpoint_segments':
-  # default-wert von checkpoint_segments ist 3, das ist wenig
-  # platzverbrauch ca checkpoint_segments * 2.5
-  # nach einem crash muss das ganze WAL wieder reingelesen werden -> Zeit für reboot steigt
-    value => 16,
-  }
-
   postgresql::server::config_entry { 'checkpoint_timeout':
   # default ist 5min. Bei Standardanwendungen ist 30min nicht schlecht
     value => '30min',
