@@ -6,6 +6,10 @@ class djserver::python_uwsgi {
     ensure => installed
   }
 
+  package { ['python3', 'python3-dev', 'python3-pip', 'python3-setuptools', 'python3-virtualenv']:
+    ensure => installed
+  }
+
 # TODO: still needed for 2.7??
   file { '/usr/lib/python2.7/decimal.py':
     ensure  => present,
