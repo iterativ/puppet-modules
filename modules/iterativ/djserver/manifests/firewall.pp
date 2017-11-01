@@ -2,7 +2,7 @@ class djserver::firewall {
 
   require djserver
 
-# firewall
+  # firewall
   package { ['iptables-persistent', 'iptables']:
     ensure => installed
   }

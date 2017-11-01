@@ -2,7 +2,7 @@ class djserver {
 
   include djserver::locales
 
-# utils
+  # utils
   package { ['locate', 'wget', 'vim', 'tmux']:
     ensure => installed
   }
