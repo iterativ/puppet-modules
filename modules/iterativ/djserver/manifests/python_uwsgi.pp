@@ -19,13 +19,8 @@ class djserver::python_uwsgi {
   }
 
   # uwsgi
-  #package { ['uwsgi', 'uwsgi-plugin-python']:
-  #  ensure => present
-  #}
-
-  package { ['uwsgi']:
-    ensure => "2.0.15",
-    provider => 'pip3'
+  package { ['uwsgi', 'uwsgi-plugin-python']:
+    ensure => present
   }
 
   # install uwsgi.service config file
