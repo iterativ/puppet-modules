@@ -25,7 +25,7 @@ class djserver::python_uwsgi {
 
   package { ['uwsgi']:
     ensure => "2.0.15",
-    provider => pip
+    provider => 'pip'
   }
 
   # install uwsgi.service config file
