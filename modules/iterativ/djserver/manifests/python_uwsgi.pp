@@ -26,7 +26,7 @@ class djserver::python_uwsgi {
   # install uwsgi.service config file
   file { "/etc/systemd/system/uwsgi.service":
     ensure  => present,
-    content => template("djserver/uwsgi.service"),
+    content => template("djserver/uwsgi.service.conf"),
     require => Package['uwsgi']
   }
 
