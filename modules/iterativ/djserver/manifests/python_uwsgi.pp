@@ -19,8 +19,13 @@ class djserver::python_uwsgi {
   }
 
   # uwsgi
-  package { ['uwsgi', 'uwsgi-plugin-python']:
-    ensure => present
+  #package { ['uwsgi', 'uwsgi-plugin-python']:
+  #  ensure => present
+  #}
+
+  package { ['uwsgi']:
+    ensure => "2.0.15",
+    provider => pip
   }
 
   # install uwsgi.service config file
@@ -37,14 +42,14 @@ class djserver::python_uwsgi {
   }
 
   # get rid of init.d style uwsgi app dirs
-  file { "/etc/uwsgi/apps-available":
-    ensure  => absent,
-    require => Package['uwsgi']
-  }
-  file { "/etc/uwsgi/apps-enabled":
-    ensure  => absent,
-    require => Package['uwsgi']
-  }
+  # file { "/etc/uwsgi/apps-available":
+  #   ensure  => absent,
+  #   require => Package['uwsgi']
+  # }
+  # file { "/etc/uwsgi/apps-enabled":
+  #   ensure  => absent,
+  #   require => Package['uwsgi']
+  # }
 
   # enable and start uwsgi.service once uwsgi init.d script is removed
   service { "uwsgi.service":
