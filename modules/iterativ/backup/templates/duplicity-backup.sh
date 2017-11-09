@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2008-2010 Damon Timm.
 # Copyright (c) 2010 Mario Santagiuliana.
-# Copyright (c) 2012-2016 Marc Gallet.
+# Copyright (c) 2012-2017 Marc Gallet.
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -44,6 +44,8 @@ CONFIG="duplicity-backup.conf"
 ##############################################################
 # Script Happens Below This Line - Shouldn't Require Editing #
 ##############################################################
+
+DBSH_VERSION="v1.4.3"
 
 # make a backup of stdout and stderr for later
 exec 6>&1
@@ -107,12 +109,32 @@ if [ ! -x "${DUPLICITY}" ]; then
   exit 1
 fi
 
-version(){
-  # Read the version string from the file VERSION
-  VERSION=$(<VERSION)
+DUPLICITY_VERSION=$(${DUPLICITY} --version)
+DUPLICITY_VERSION=${DUPLICITY_VERSION//[^0-9\.]/}
 
-  echo "duplicity-backup.sh ${VERSION}"
-  ${DUPLICITY} --version
+version_compare() {
+    if [[ $1 =~ ^([0-9]+\.?)+$ && $2 =~ ^([0-9]+\.?)+$ ]]; then
+        local l=(${1//./ }) r=(${2//./ }) s=${#l[@]}; [[ ${#r[@]} -gt ${#l[@]} ]] && s=${#r[@]}
+
+        for i in $(seq 0 $((s - 1))); do
+            [[ ${l[$i]} -gt ${r[$i]} ]] && return 1
+            [[ ${l[$i]} -lt ${r[$i]} ]] && return 2
+        done
+
+        return 0
+    else
+        echo "Invalid version number given"
+        exit 1
+    fi
+}
+
+# set a flag if duplicity's version is lower than 0.7, for usage later in the script
+version_compare "${DUPLICITY_VERSION}" 0.7
+case $? in 2) LT07=1;; *) LT07=0;; esac
+
+version(){
+  echo "duplicity-backup.sh ${DBSH_VERSION}"
+  echo "duplicity ${DUPLICITY_VERSION}"
   exit 0
 }
 
@@ -283,7 +305,7 @@ fi
 # fd1 is stdout and is always logged but only shown if not QUIET
 # fd2 is stderr and is always shown on screen and logged
 # fd3 is like stdout but always shown on screen (for interactive prompts)
-# fd4 is always shown on sceen but never logged (for the usage text)
+# fd4 is always shown on screen but never logged (for the usage text)
 # fd5 is never shown on screen but always logged (for delimiters in the log)
 #
 
@@ -536,6 +558,9 @@ send_notification()
       -F "message=${NOTIFICATION_CONTENT}" \
       https://api.pushover.net/1/messages
       echo -e "Pushover notification sent"
+    elif [ "${NOTIFICATION_SERVICE}" = "telegram" ]; then
+        curl -s --max-time 10 -d "chat_id=${TELEGRAM_CHATID}&disable_web_page_preview=1&text=${NOTIFICATION_CONTENT}" "https://api.telegram.org/bot${TELEGRAM_KEY}/sendMessage" >/dev/null
+      echo -e "Telegram notification sent"
     fi
   fi
 }
@@ -700,7 +725,11 @@ include_exclude()
 
   # Include/Exclude globbing filelist
   if [ "${INCEXCFILE}" != '' ]; then
-    TMP=" --include-globbing-filelist '${INCEXCFILE}'"
+    if [ ${LT07} -eq 1 ]; then
+      TMP=" --include-globbing-filelist '${INCEXCFILE}'"
+    else
+      TMP=" --include-filelist '${INCEXCFILE}'"
+    fi
     INCLUDE=${INCLUDE}${TMP}
   fi
 
@@ -873,6 +902,11 @@ backup_this_script()
 check_variables
 
 echo -e "--------    START DUPLICITY-BACKUP SCRIPT for ${HOSTNAME}   --------\n" >&5
+
+echo -e "-------[ Program versions ]-------"
+echo -e "duplicity-backup.sh ${DBSH_VERSION}"
+echo -e "duplicity ${DUPLICITY_VERSION}"
+echo -e "----------------------------------\n"
 
 get_lock
 
