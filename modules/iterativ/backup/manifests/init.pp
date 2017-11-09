@@ -4,19 +4,13 @@ class backup {
       ensure => installed,
     }
 
-    package { "boto":
-      ensure => installed,
-      provider => 'pip',
-      require => Package["duplicity"],
-    }
-
     file { "/usr/local/bin/duplicity-backup.sh":
       ensure => present,
       owner => root,
       group => root,
       mode => 755,
       content => template("backup/duplicity-backup.sh"),
-      require => Package["boto"],
+      require => Package["duplicity"],
     }
 
     file { "/etc/duplicity-backup.conf":
