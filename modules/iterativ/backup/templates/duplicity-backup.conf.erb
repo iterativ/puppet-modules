@@ -98,6 +98,21 @@ HOSTNAME=$(hostname -f)
 #DEST="s3://host/backup-bucket/backup-folder/"
 DEST="<%= backup_destination %>"
 
+# The AWS user needs the follogin permissions to work with the bucket:
+# {
+#    "Version": "2012-10-17",
+#    "Statement": [
+#        {
+#            "Effect": "Allow",
+#            "Action": "s3:*",
+#            "Resource": [
+#                "arn:aws:s3:::<bucket>",
+#                "arn:aws:s3:::<bucket>/*"
+#            ]
+#        }
+#    ]
+#}
+
 # Other possible locations
 # Be sure to check duplicity's man page to know how to use them
 # (http://duplicity.nongnu.org/duplicity.1.html)
@@ -428,28 +443,30 @@ MAIL="mailx"     # default command for Linux mail
 # notifications will be sent.
 
 # Possible values for NOTIFICATION_SERVICE are: slack, pushover, ifttt, telegram
-NOTIFICATION_SERVICE=""
-NOTIFICATION_FAILURE_ONLY="yes" # send notifications only if there was an error while creating backup
+<%= @notifcation_settings %>
+#NOTIFICATION_SERVICE=""
+#NOTIFICATION_FAILURE_ONLY="yes" # send notifications only if there was an error while creating backup
 
 # Provider: Slack
-SLACK_HOOK_URL="https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
-SLACK_CHANNEL="#general"
-SLACK_USERNAME="duplicity-backup"
-SLACK_EMOJI="package"
+#SLACK_HOOK_URL="https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+#SLACK_CHANNEL="#general"
+#SLACK_USERNAME="duplicity-backup"
+#SLACK_EMOJI="package"
 
 # Provider: Pushover
-PUSHOVER_TOKEN="" # App token generated at pushover.net
-PUSHOVER_USER="" # User key from pushover.net
+#PUSHOVER_TOKEN="" # App token generated at pushover.net
+#PUSHOVER_USER="" # User key from pushover.net
 
 # Provider: IFTTT
-IFTTT_KEY="" # Key for MAKER channel at IFTTT
-IFTTT_MAKER_EVENT="duplicity" # name the event to trigger at IFTTT Maker Channel
-IFTTT_HOOK_URL="https://maker.ifttt.com/trigger/$IFTTT_MAKER_EVENT/with/key/$IFTTT_KEY" # ONLY change this if IFTTT changes it
-IFTTT_VALUE2="" # general purpose value to pass to your maker channel (optional)
+#IFTTT_KEY="" # Key for MAKER channel at IFTTT
+#IFTTT_MAKER_EVENT="duplicity" # name the event to trigger at IFTTT Maker Channel
+#IFTTT_HOOK_URL="https://maker.ifttt.com/trigger/$IFTTT_MAKER_EVENT/with/key/$IFTTT_KEY" # ONLY change this if IFTTT changes it
+#IFTTT_VALUE2="" # general purpose value to pass to your maker channel (optional)
 
 # Provider: Telegram
-TELEGRAM_CHATID="" #Generate a Telegram bot following guide: https://core.telegram.org/bots#3-how-do-i-create-a-bot
-TELEGRAM_KEY=""
+#TELEGRAM_CHATID="" #Generate a Telegram bot following guide: https://core.telegram.org/bots#3-how-do-i-create-a-bot
+#TELEGRAM_KEY=""
+
 
 # ------------------------------------------------------------------------------
 # TROUBLESHOOTING
