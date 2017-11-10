@@ -4,13 +4,18 @@ class backup {
       ensure => installed,
     }
 
+    package { "python-boto":
+      ensure => installed,
+      require => Package["duplicity"],
+    }
+
     file { "/usr/local/bin/duplicity-backup.sh":
       ensure => present,
       owner => root,
       group => root,
       mode => 755,
       content => template("backup/duplicity-backup.sh"),
-      require => Package["duplicity"],
+      require => Package["python-boto"],
     }
 
     file { "/etc/duplicity-backup.conf":
