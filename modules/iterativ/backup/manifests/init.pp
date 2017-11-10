@@ -1,5 +1,5 @@
 class backup {
-  define duplicity_backup_s3($aws_access_key_id, $aws_secret_access_key, $passphrase, $backup_destination, $inclist, $exclist, $notification_settings) {
+  define duplicity_backup_s3($aws_access_key_id, $aws_secret_access_key, $passphrase, $backup_destination, $inclist, $exclist, $notification_settings='') {
     package { "duplicity":
       ensure => installed,
     }
